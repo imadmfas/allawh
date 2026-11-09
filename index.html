@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1b2a4a">
+<title>اللوح المحاور — منصة الكتب المدرسية التفاعلية</title>
+<meta name="description" content="اللوح المحاور: منصة مجانية تحوّل كتب المنهج العراقي من الأول الابتدائي إلى السادس الإعدادي إلى كتب تفاعلية فيها دروس وألعاب واختبارات.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+@font-face{font-family:'Naskh';src:url(fonts/noto-naskh-arabic-arabic-500-normal.woff2) format('woff2');font-weight:400 500;font-display:swap}
+@font-face{font-family:'Naskh';src:url(fonts/noto-naskh-arabic-arabic-700-normal.woff2) format('woff2');font-weight:600 800;font-display:swap}
+@font-face{font-family:'Amiri';src:url(fonts/amiri-arabic-700-normal.woff2) format('woff2');font-weight:700;font-display:swap}
+:root{--ink:#1b2a4a;--paper:#f7f4ec;--card:#fff;--muted:#6b7385;--gold:#f2b632;--line:#e4dfd2;--r:22px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{font-family:'Naskh',serif;color:var(--ink);background:var(--paper);min-height:100vh;line-height:1.8;
+  background-image:radial-gradient(circle at 1px 1px,rgba(27,42,74,.07) 1px,transparent 0);background-size:22px 22px}
+button{font-family:inherit;color:inherit;cursor:pointer}
+a{color:inherit}
+[hidden]{display:none!important}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px max(16px,env(safe-area-inset-right)) 10px max(16px,env(safe-area-inset-left));
+  background:rgba(27,42,74,.96);color:#fff;backdrop-filter:blur(8px)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff}
+.brand svg{width:40px;height:40px}
+.brand b{font-family:'Amiri',serif;font-size:26px;line-height:1}
+.brand small{display:block;font-size:12px;opacity:.75;line-height:1.4}
+.sp{flex:1}
+.me{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:0;border-radius:40px;padding:4px 6px 4px 14px;font-size:15px}
+.me .av{width:36px;height:36px;font-size:22px}
+.stars{color:var(--gold);font-weight:700}
+main{max-width:1100px;margin:0 auto;padding:18px 16px 60px}
+.crumbs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:15px;color:var(--muted);margin:4px 0 14px}
+.crumbs a{text-decoration:none;background:#fff;border:1px solid var(--line);padding:2px 12px;border-radius:30px}
+h1{font-family:'Amiri',serif;font-size:clamp(28px,5vw,44px);margin:6px 0 4px;line-height:1.4}
+.lead{color:var(--muted);font-size:17px;margin:0 0 22px}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(var(--min,240px),1fr))}
+.tile{text-decoration:none;position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:var(--h,190px);padding:20px;border:0;border-radius:var(--r);text-align:right;
+  color:#fff;background:var(--c);overflow:hidden;box-shadow:0 6px 0 color-mix(in srgb,var(--c) 70%,#000),0 14px 30px rgba(27,42,74,.15);transition:transform .15s}
+.tile:hover{transform:translateY(-3px)}
+.tile:active{transform:translateY(3px);box-shadow:0 2px 0 color-mix(in srgb,var(--c) 70%,#000)}
+.tile .big{position:absolute;inset-inline-start:-6px;top:-30px;font-family:'Amiri',serif;font-size:150px;opacity:.16;line-height:1}
+.tile b{font-size:clamp(24px,3.6vw,32px);line-height:1.3}
+.tile span{opacity:.9;font-size:15px}
+.badge{position:absolute;top:14px;inset-inline-end:14px;background:rgba(255,255,255,.95);color:var(--ink);font-size:13px;font-weight:700;padding:2px 10px;border-radius:20px}
+.badge.exit{background:var(--gold)}
+.note{background:#fff8e1;border:1px dashed #e0b84d;border-radius:14px;padding:10px 14px;font-size:14px;color:#6b5414;margin:0 0 18px}
+/* الأغلفة */
+.shelf{--min:170px}
+.book{display:block;text-decoration:none;border:0;padding:0;background:none;text-align:center;color:var(--ink)}
+.cover{position:relative;aspect-ratio:3/4.2;border-radius:6px 16px 16px 6px;background:var(--c);color:#fff;overflow:hidden;
+  box-shadow:inset 10px 0 0 rgba(0,0,0,.18),inset 13px 0 0 rgba(255,255,255,.18),0 10px 22px rgba(27,42,74,.22);transition:transform .2s}
+.book:hover .cover{transform:translateY(-4px) rotate(-1deg)}
+.cover::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.07) 0 10px,transparent 10px 20px)}
+.cover .mk{position:absolute;top:18%;left:0;right:0;font-family:'Amiri',serif;font-size:72px;line-height:1;text-shadow:0 3px 0 rgba(0,0,0,.15)}
+.cover .ti{position:absolute;bottom:22%;left:10px;right:16px;font-size:20px;font-weight:700;line-height:1.4}
+.cover .gr{position:absolute;bottom:8%;left:10px;right:16px;font-size:13px;opacity:.85}
+.book.soon .cover{filter:grayscale(.55) brightness(1.05);opacity:.75}
+.book .st{display:inline-block;margin-top:8px;font-size:14px;font-weight:700;padding:1px 12px;border-radius:20px;background:#d3f9d8;color:#2b8a3e}
+.book.soon .st{background:#eceae3;color:var(--muted)}
+/* نافذة الطالب */
+dialog{border:0;border-radius:26px;padding:0;max-width:560px;width:calc(100% - 28px);box-shadow:0 30px 80px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(27,42,74,.55)}
+.dlg{padding:24px}
+.dlg h2{font-family:'Amiri',serif;margin:0 0 6px;font-size:30px}
+.dlg input{width:100%;font:inherit;font-size:22px;padding:10px 16px;border:2px solid var(--line);border-radius:16px;margin:8px 0 14px;text-align:center}
+.dlg input:focus{outline:0;border-color:#1c7ed6}
+.avs{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.av{display:grid;place-items:center;aspect-ratio:1;border-radius:50%;font-size:30px;background:var(--b,#eef);border:3px solid transparent}
+.avs .av[aria-pressed=true]{border-color:var(--ink);transform:scale(1.08)}
+.go{width:100%;margin-top:18px;font-size:22px;font-weight:700;padding:12px;border:0;border-radius:18px;background:#2b8a3e;color:#fff;box-shadow:0 5px 0 #1e6b2f}
+.go:disabled{background:#adb5bd;box-shadow:0 5px 0 #868e96}
+.link{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:14px;margin-top:10px}
+footer{text-align:center;color:var(--muted);font-size:14px;padding:20px 16px 40px}
+footer a{color:#1c7ed6}
+@media (max-width:520px){.grid{--min:150px!important;--h:150px!important;gap:12px}.tile{padding:14px}.tile .big{font-size:110px}.tile span{font-size:13px}.brand small{display:none}.me .nm{display:none}.shelf{--min:140px}.cover .mk{font-size:56px}.cover .ti{font-size:17px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="#/" aria-label="اللوح المحاور، الصفحة الرئيسة">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="6" width="32" height="26" rx="5" fill="#f2b632"/><rect x="8" y="10" width="24" height="18" rx="3" fill="#1b2a4a"/><path d="M13 16h14M13 21h9" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M26 30h14a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4h-4l-5 4v-4h-5a4 4 0 0 1-4-4v-6a4 4 0 0 1 4-4z" fill="#4dabf7"/><circle cx="29" cy="37" r="1.6" fill="#fff"/><circle cx="34" cy="37" r="1.6" fill="#fff"/><circle cx="39" cy="37" r="1.6" fill="#fff"/></svg>
+    <span><b>اللوح المحاور</b><small>كتب المنهج العراقي تفاعلية</small></span>
+  </a>
+  <span class="sp"></span>
+  <button class="me" id="meBtn" hidden><span class="stars" id="meStars"></span><span class="nm" id="meName"></span><span class="av" id="meAv"></span></button>
+</header>
+<main id="app"></main>
+<footer>
+  إعداد البروفيسور عماد محمد فرحان، باستعمال المساعد الذكي كلاود.<br>
+  منصة مجانية بلا إعلانات، ويُحفظ تقدّم الطالب على جهازه فقط.
+  · <a id="wa" target="_blank" rel="noopener">أرسل ملاحظة</a>
+</footer>
+
+<dialog id="profile">
+  <form class="dlg" method="dialog" id="pform">
+    <h2>أهلاً بك في اللوح المحاور</h2>
+    <div style="color:var(--muted)">اكتب اسمك واختر صورتك</div>
+    <input id="pname" maxlength="20" placeholder="اسمك" autocomplete="off" required>
+    <div class="avs" id="avs"></div>
+    <button class="go" id="pgo" disabled>هيا نبدأ</button>
+    <button type="button" class="link" id="preset" hidden>مسح ملف الطالب من هذا الجهاز</button>
+  </form>
+</dialog>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
