@@ -30,3 +30,16 @@
 - الخامس العلمي، الفيزياء: https://imadmfas.github.io/physics5/
 - الخامس العلمي، الكيمياء: https://imadmfas.github.io/chemistry5/
 - السادس الإعدادي، القواعد: https://imadmfas.github.io/arabic6grade/
+
+## الاشتراك
+
+- الدروس الخمسة الأولى من كل كتاب مجانية، وكلمة السر تفتح كتب الصف كله.
+- ترتبط كلمة السر بجهاز واحد، وتنتقل إلى جهاز آخر بعد تسجيل الخروج من الأول، أو بفك ارتباطها من صفحة الإدارة.
+- الخادم مشروع Supabase، وإعداده كله في `supabase/setup.sql`.
+- صفحة الإدارة: https://imadmfas.github.io/allawh/admin.html
+- ربط كتاب بالاشتراك:
+
+```js
+import { gate } from 'https://imadmfas.github.io/allawh/access.js';
+if (await gate({ grade: 's6-sci', lesson: 7 })) openLesson(7);
+```

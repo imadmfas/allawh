@@ -1,4 +1,5 @@
 import { STAGES, SUBJECTS, BRANCHES, GRADE1_PROGRESS_KEYS, WHATSAPP } from './data/catalog.js';
+import { hasAccess, askCode, logout, myKeys, prettyCode, GRADE_NAMES, FREE } from './access.js';
 
 const $ = (s) => document.querySelector(s);
 const app = $('#app');
@@ -45,6 +46,8 @@ function openProfile() {
   let pick = profile ? profile.av : -1;
   $('#pname').value = profile ? profile.name : '';
   $('#preset').hidden = !profile;
+  const keys = Object.entries(myKeys());
+  $('#psubs').innerHTML = keys.length ? '<b>الصفوف المفتوحة على هذا الجهاز:</b> ' + keys.map(([g, k]) => `${GRADE_NAMES[g] || g} <code dir="ltr">${prettyCode(k.code).slice(0, 4)}-…</code>`).join('، ') : '';
   const avs = $('#avs');
   avs.innerHTML = AVATARS.map((a, i) => `<button type="button" class="av" style="--b:${a[1]}" data-i="${i}" aria-pressed="${i === pick}" aria-label="صورة ${i + 1}">${a[0]}</button>`).join('');
   const check = () => { $('#pgo').disabled = !($('#pname').value.trim() && pick >= 0); };
@@ -147,6 +150,7 @@ function viewGrade(gid, br) {
   return `${crumbs(path)}
     <h1>كتب ${esc(name)}</h1>
     <p class="lead">${playful ? 'دروس على شكل مراحل وألعاب، وكل لعبة تمنحك نجمة.' : 'دروس وتجارب واختبار في نهاية كل فصل، ولا ينفتح الفصل التالي حتى تنجح فيه.'}${g.exit ? ' وفي هذا الصف أسئلة على نمط الامتحان الوزاري.' : ''}</p>
+    <div class="sub" id="sub" data-grade="${br ? g.id + '-' + br : g.id}"></div>
     ${node.draft ? '<div class="note">قائمة الكتب في هذا الصف مسودة أولى، وستُراجَع على طبعة 2026.</div>' : ''}
     <div class="grid shelf">${node.books.map((b) => cover(b, name)).join('')}</div>`;
 }
@@ -161,6 +165,26 @@ function route() {
   app.innerHTML = html;
   window.scrollTo(0, 0);
   paintMe();
+  paintSub();
+}
+
+async function paintSub() {
+  const box = document.getElementById('sub'); if (!box) return;
+  const grade = box.dataset.grade;
+  const open = await hasAccess(grade);
+  if (open) {
+    box.className = 'sub on';
+    box.innerHTML = `<span>✓ كتب هذا الصف مفتوحة كلها على هذا الجهاز.</span> <button type="button" id="subOut">تسجيل الخروج من كلمة السر</button>`;
+    box.querySelector('#subOut').onclick = async () => {
+      if (!confirm('بعد تسجيل الخروج تستطيع استعمال كلمة السر في جهاز آخر. هل تريد المتابعة؟')) return;
+      const r = await logout(grade);
+      if (!r.ok) alert(r.msg); paintSub();
+    };
+  } else {
+    box.className = 'sub';
+    box.innerHTML = `<span>الدروس ${ar(FREE)} الأولى من كل كتاب مجانية.</span> <button type="button" id="subIn">عندي كلمة سر</button>`;
+    box.querySelector('#subIn').onclick = async () => { await askCode(grade, { voluntary: true }); paintSub(); };
+  }
 }
 
 addEventListener('hashchange', route);

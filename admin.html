@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>إدارة كلمات السر — اللوح المحاور</title>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+@font-face{font-family:'Naskh';src:url(fonts/noto-naskh-arabic-arabic-500-normal.woff2) format('woff2');font-weight:400 500}
+@font-face{font-family:'Naskh';src:url(fonts/noto-naskh-arabic-arabic-700-normal.woff2) format('woff2');font-weight:600 800}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Naskh',serif;background:#f7f4ec;color:#1b2a4a;line-height:1.7}
+header{background:#1b2a4a;color:#fff;padding:12px 18px;display:flex;align-items:center;gap:12px}
+header b{font-size:20px;flex:1}
+main{max-width:1000px;margin:0 auto;padding:18px}
+.card{background:#fff;border:1px solid #e4dfd2;border-radius:18px;padding:18px;margin-bottom:16px}
+h2{margin:0 0 10px;font-size:20px}
+label{display:block;font-size:14px;color:#5c6478;margin-bottom:8px}
+input,select{font:inherit;font-size:16px;padding:8px 10px;border:1px solid #d6d0c0;border-radius:10px;width:100%;margin-top:2px;background:#fff}
+.f{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));align-items:end}
+button{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:10px;padding:8px 14px;background:#1b2a4a;color:#fff}
+button.g{background:#2b8a3e}button.l{background:#eceae3;color:#1b2a4a}button.r{background:#fff;color:#c92a2a;border:1px solid #ffc9c9}
+.msg{min-height:22px;font-size:14px;color:#c92a2a}
+.out{white-space:pre-wrap;direction:ltr;text-align:left;font:16px/1.8 monospace;background:#f1f3f5;border-radius:10px;padding:10px;margin-top:10px}
+.list{display:grid;gap:8px;margin-top:12px}
+.it{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;border:1px solid #eee;border-radius:12px;padding:8px 12px;font-size:14px}
+.it code{font-size:16px;font-weight:700;direction:ltr}
+.it .s{padding:0 10px;border-radius:20px;font-weight:700}
+.on{background:#d3f9d8;color:#2b8a3e}.free{background:#e7f5ff;color:#1971c2}.off{background:#ffe3e3;color:#c92a2a}
+.it .sp{flex:1}
+.stats{display:flex;gap:16px;flex-wrap:wrap;font-size:15px}
+</style>
+</head>
+<body>
+<header><b>إدارة كلمات السر — اللوح المحاور</b><button class="l" id="out" hidden>خروج</button></header>
+<main>
+  <section class="card" id="login">
+    <h2>دخول المدير</h2>
+    <div class="f">
+      <label>البريد الإلكتروني<input id="em" type="email" dir="ltr" autocomplete="username"></label>
+      <label>كلمة المرور<input id="pw" type="password" dir="ltr" autocomplete="current-password"></label>
+      <button id="go">دخول</button>
+    </div>
+    <div class="msg" id="lmsg"></div>
+  </section>
+
+  <div id="panel" hidden>
+    <section class="card">
+      <h2>توليد كلمات سر جديدة</h2>
+      <div class="f">
+        <label>الصف<select id="cg"></select></label>
+        <label>العدد<input id="cn" type="number" min="1" max="200" value="1"></label>
+        <label>ملاحظة (اسم المشتري أو هاتفه)<input id="cnote"></label>
+        <label>المدة بالأيام (فارغ = حتى نهاية الاشتراك يدويًا)<input id="cd" type="number" min="1"></label>
+        <button class="g" id="mk">ولّد</button>
+      </div>
+      <div class="msg" id="mmsg"></div>
+      <div id="made"></div>
+    </section>
+
+    <section class="card">
+      <h2>كلمات السر</h2>
+      <div class="f">
+        <label>الصف<select id="fg"><option value="">كل الصفوف</option></select></label>
+        <label>بحث (كلمة أو ملاحظة)<input id="fq"></label>
+        <button class="l" id="rf">تحديث</button>
+      </div>
+      <div class="stats" id="st"></div>
+      <div class="list" id="ls"></div>
+    </section>
+  </div>
+</main>
+<script type="module">
+import { SUPABASE_URL, SUPABASE_KEY, GRADE_NAMES, prettyCode } from './access.js';
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let token = sessionStorage.getItem('alw-admin');
+
+async function api(fn, body) {
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, { method: 'POST',
+    headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+  const j = await r.json().catch(() => null);
+  if (!r.ok) { if (r.status === 401) logoutAdmin(); throw new Error((j && (j.message || j.msg)) || 'خطأ ' + r.status); }
+  return j;
+}
+
+for (const [k, v] of Object.entries(GRADE_NAMES)) { $('#cg').add(new Option(v, k)); $('#fg').add(new Option(v, k)); }
+
+function show() { $('#login').hidden = !!token; $('#panel').hidden = !token; $('#out').hidden = !token; if (token) load(); }
+function logoutAdmin() { token = null; sessionStorage.removeItem('alw-admin'); show(); }
+$('#out').onclick = logoutAdmin;
+
+$('#go').onclick = async () => {
+  $('#lmsg').textContent = '';
+  const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, { method: 'POST',
+    headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify({ email: $('#em').value.trim(), password: $('#pw').value }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || !j.access_token) { $('#lmsg').textContent = 'البريد أو كلمة المرور غير صحيحة.'; return; }
+  token = j.access_token; sessionStorage.setItem('alw-admin', token); show();
+};
+
+$('#mk').onclick = async () => {
+  $('#mmsg').textContent = ''; $('#made').innerHTML = '';
+  try {
+    const codes = await api('allawh_admin_create', { p_grade: $('#cg').value, p_count: +$('#cn').value || 1, p_note: $('#cnote').value || null, p_days: $('#cd').value ? +$('#cd').value : null });
+    const g = GRADE_NAMES[$('#cg').value];
+    const txt = codes.map(prettyCode).join('\n');
+    const msg = `اشتراكك في «اللوح المحاور» — ${g}\nكلمة السر: ${codes.map(prettyCode).join('، ')}\nافتح: https://imadmfas.github.io/allawh/\nتعمل الكلمة على جهاز واحد. لنقلها إلى جهاز آخر سجّل الخروج من الجهاز الأول.`;
+    $('#made').innerHTML = `<div class="out">${esc(txt)}</div><div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><button class="l" id="cp">نسخ رسالة للطالب</button></div>`;
+    $('#cp').onclick = () => navigator.clipboard.writeText(msg).then(() => { $('#cp').textContent = 'نُسخت'; });
+    load();
+  } catch (e) { $('#mmsg').textContent = e.message; }
+};
+
+let rows = [];
+async function load() {
+  try { rows = await api('allawh_admin_list', { p_grade: $('#fg').value || null }); paint(); }
+  catch (e) { $('#ls').textContent = e.message; }
+}
+function paint() {
+  const q = $('#fq').value.trim().toUpperCase().replace(/-/g, '');
+  const list = rows.filter((r) => !q || r.code.includes(q) || (r.note || '').toUpperCase().includes(q));
+  const on = rows.filter((r) => r.device_id && !r.revoked).length, off = rows.filter((r) => r.revoked).length;
+  $('#st').innerHTML = `<span>المجموع: <b>${rows.length}</b></span><span>مفعّلة على جهاز: <b>${on}</b></span><span>حرة: <b>${rows.length - on - off}</b></span><span>موقوفة: <b>${off}</b></span>`;
+  $('#ls').innerHTML = list.map((r) => {
+    const exp = r.expires_at && new Date(r.expires_at) < new Date();
+    const s = r.revoked ? '<span class="s off">موقوفة</span>' : exp ? '<span class="s off">منتهية</span>' : r.device_id ? '<span class="s on">مفعّلة</span>' : '<span class="s free">حرة</span>';
+    return `<div class="it" data-c="${r.code}"><code>${prettyCode(r.code)}</code>${s}<span>${esc(GRADE_NAMES[r.grade] || r.grade)}</span>
+      <span>${esc(r.note || '')}</span><span style="color:#868e96">${r.device_label ? esc(r.device_label) : ''}</span><span class="sp"></span>
+      ${r.device_id ? '<button class="l" data-a="rel">فك الجهاز</button>' : ''}
+      <button class="${r.revoked ? 'g' : 'r'}" data-a="rev">${r.revoked ? 'إعادة تفعيل' : 'إيقاف'}</button></div>`;
+  }).join('') || '<div style="color:#868e96">لا توجد كلمات سر بعد.</div>';
+}
+$('#fq').oninput = paint; $('#fg').onchange = load; $('#rf').onclick = load;
+$('#ls').onclick = async (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  const code = b.closest('.it').dataset.c, r = rows.find((x) => x.code === code);
+  try {
+    if (b.dataset.a === 'rel' && confirm('فك ارتباط الكلمة بالجهاز الحالي؟')) await api('allawh_admin_release', { p_code: code });
+    if (b.dataset.a === 'rev') await api('allawh_admin_set', { p_code: code, p_revoked: !r.revoked, p_note: r.note });
+    load();
+  } catch (err) { alert(err.message); }
+};
+show();
+</script>
+</body>
+</html>
