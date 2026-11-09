@@ -1,5 +1,6 @@
 import { STAGES, SUBJECTS, BRANCHES, GRADE1_PROGRESS_KEYS, WHATSAPP } from './data/catalog.js';
 import { hasAccess, askCode, logout, myKeys, prettyCode, GRADE_NAMES, FREE } from './access.js';
+import { hit, online } from './stats.js';
 
 const $ = (s) => document.querySelector(s);
 const app = $('#app');
@@ -85,6 +86,7 @@ function viewHome() {
   return `
     <h1>${hi}اختر مرحلتك الدراسية</h1>
     <p class="lead">كتب المنهج العراقي دروسًا تفاعلية واختبارات، من الأول الابتدائي إلى السادس الإعدادي.</p>
+    <div class="live"><span class="lv"><i class="dot"></i> المتصلون الآن: <b id="stOn">…</b></span><span class="lv" id="stTotWrap" hidden>👁️ عدد الزيارات: <b id="stTot"></b></span></div>
     <div class="grid" style="--min:280px;--h:220px">
       ${STAGES.map((s) => `
         <a class="tile" href="#/${s.id}" style="--c:${s.color}">
@@ -187,6 +189,15 @@ async function paintSub() {
   }
 }
 
+const STATS = { total: null, on: null };
+function paintStats() {
+  const on = document.getElementById('stOn'), tw = document.getElementById('stTotWrap'), t = document.getElementById('stTot');
+  if (on) on.textContent = STATS.on == null ? '…' : STATS.on.toLocaleString('ar-IQ');
+  if (tw) { tw.hidden = STATS.total == null; if (t && STATS.total != null) t.textContent = Number(STATS.total).toLocaleString('ar-IQ'); }
+}
+hit('hub').then((n) => { STATS.total = n; paintStats(); });
+online('hub', (n) => { STATS.on = n; paintStats(); });
+addEventListener('hashchange', () => setTimeout(paintStats, 0));
 addEventListener('hashchange', route);
 addEventListener('pageshow', paintMe);
 $('#wa').href = 'https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent('ملاحظة على منصة اللوح المحاور: ');
