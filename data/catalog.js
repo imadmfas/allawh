@@ -74,7 +74,8 @@ export const STAGES = [
         sci: { draft: true, books: [
           b('grammar', { title: 'أساسيات القواعد', status: 'ready', url: GH + 'arabic6grade/' }),
           b('physics', { title: 'مختبر الفيزياء', status: 'ready', url: GH + 'physics6/' }),
-          b('arabic'), b('islamic'), b('english'), b('math'), b('chemistry'), b('biology'),
+          b('chemistry', { title: 'مختبر الكيمياء', status: 'ready', url: GH + 'chemistry6/' }),
+          b('arabic'), b('islamic'), b('english'), b('math'), b('biology'),
         ] },
         lit: { draft: true, books: [
           b('grammar', { title: 'أساسيات القواعد', status: 'ready', url: GH + 'arabic6grade/' }),
