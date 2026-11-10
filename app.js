@@ -184,7 +184,7 @@ async function paintSub() {
     };
   } else {
     box.className = 'sub';
-    box.innerHTML = `<span>الدروس ${ar(FREE)} الأولى من كل كتاب مجانية.</span> <button type="button" id="subIn">عندي كلمة سر</button>`;
+    box.innerHTML = `<span>الدرس الأول من كل فصل مجاني في كل كتاب.</span> <button type="button" id="subIn">عندي كلمة سر</button>`;
     box.querySelector('#subIn').onclick = async () => { await askCode(grade, { voluntary: true }); paintSub(); };
   }
 }

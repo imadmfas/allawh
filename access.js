@@ -3,11 +3,11 @@
 // تستعمله البوابة وكل كتاب منشور على imadmfas.github.io:
 //   import { gate } from 'https://imadmfas.github.io/allawh/access.js';
 //   if (await gate({ grade: 's6-sci', lesson: 7 })) openLesson(7);
-// الدروس 1..FREE مجانية دائمًا.
+// الدرس الأول من كل فصل مجاني دائمًا: يمرّر الكتاب رقم الدرس داخل فصله، فعدد الدروس المجانية يساوي عدد الفصول.
 
 export const SUPABASE_URL = 'https://hdpydtkdecudxfquzixa.supabase.co';
 export const SUPABASE_KEY = 'sb_publishable_0toaCUQR517Y4Ocnb3px_w_cv20TdcA';
-export const FREE = 5;
+export const FREE = 1;
 export const WHATSAPP = '9647812346562';
 const RECHECK_MS = 6 * 3600e3;       // يعيد التحقق من الخادم كل ست ساعات
 const OFFLINE_GRACE_MS = 7 * 86400e3; // بلا إنترنت يبقى الصف مفتوحًا أسبوعًا من آخر تحقق ناجح
@@ -128,8 +128,8 @@ export function askCode(grade, { voluntary = false } = {}) {
     bg.className = 'alw-bg';
     bg.innerHTML = `<form class="alw">
       <div class="lk">🔒</div>
-      <h3>${voluntary ? 'أدخل كلمة السر' : 'انتهت الدروس المجانية'}</h3>
-      <p>${voluntary ? '' : 'الدروس الخمسة الأولى مجانية. '}لفتح كتب ${name} كلها أدخل كلمة السر.</p>
+      <h3>${voluntary ? 'أدخل كلمة السر' : 'هذا الدرس للمشتركين'}</h3>
+      <p>${voluntary ? '' : 'الدرس الأول من كل فصل مجاني. '}لفتح كتب ${name} كلها أدخل كلمة السر.</p>
       <input name="c" placeholder="XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
       <div class="er" aria-live="polite"></div>
       <button class="ok">افتح</button>
@@ -150,7 +150,7 @@ export function askCode(grade, { voluntary = false } = {}) {
   });
 }
 
-// الدالة التي تستدعيها الكتب: lesson رقم الدرس في الكتاب ابتداءً من 1
+// الدالة التي تستدعيها الكتب: lesson رقم الدرس داخل فصله ابتداءً من 1
 export async function gate({ grade, lesson }) {
   if (lesson <= FREE) return true;
   if (await hasAccess(grade)) return true;
