@@ -75,7 +75,8 @@ export const STAGES = [
           b('grammar', { title: 'أساسيات القواعد', status: 'ready', url: GH + 'arabic6grade/' }),
           b('physics', { title: 'مختبر الفيزياء', status: 'ready', url: GH + 'physics6/' }),
           b('chemistry', { title: 'مختبر الكيمياء', status: 'ready', url: GH + 'chemistry6/' }),
-          b('arabic'), b('islamic'), b('english'), b('math'), b('biology'),
+          b('biology', { title: 'مختبر الأحياء', status: 'ready', url: GH + 'biology6/' }),
+          b('arabic'), b('islamic'), b('english'), b('math'),
         ] },
         lit: { draft: true, books: [
           b('grammar', { title: 'أساسيات القواعد', status: 'ready', url: GH + 'arabic6grade/' }),
