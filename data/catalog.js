@@ -72,7 +72,7 @@ export const STAGES = [
       } },
       { id: 's6', name: 'السادس الإعدادي', exit: true, branches: {
         sci: { draft: true, books: [
-          b('grammar', { title: 'أساسيات القواعد', status: 'ready', url: GH + 'arabic6grade/' }),
+          b('grammar', { title: 'أساسيات القواعد', status: 'ready', url: GH + 'arabic6/' }),
           b('physics', { title: 'مختبر الفيزياء', status: 'ready', url: GH + 'physics6/' }),
           b('chemistry', { title: 'مختبر الكيمياء', status: 'ready', url: GH + 'chemistry6/' }),
           b('biology', { title: 'مختبر الأحياء', status: 'ready', url: GH + 'biology6/' }),
@@ -80,7 +80,7 @@ export const STAGES = [
           b('arabic'), b('islamic'), b('english'),
         ] },
         lit: { draft: true, books: [
-          b('grammar', { title: 'أساسيات القواعد', status: 'ready', url: GH + 'arabic6grade/' }),
+          b('grammar', { title: 'أساسيات القواعد', status: 'ready', url: GH + 'arabic6/' }),
           b('arabic'), b('islamic'), b('english'), b('math'), b('history'), b('geography'), b('economics'),
         ] },
       } },
