@@ -88,7 +88,8 @@ export async function activate(grade, code) {
   const keys = myKeys();
   keys[res.grade] = { code: cleanCode(code), ok_at: Date.now() };
   ls.set(KEYS, keys);
-  if (grade && res.grade !== grade) return { ok: false, msg: ERR.wrong_grade + (GRADE_NAMES[res.grade] || res.grade) + '. فُعّلت لذلك الصف.' };
+  const want = [].concat(grade || []);
+  if (want.length && !want.includes(res.grade)) return { ok: false, msg: ERR.wrong_grade + (GRADE_NAMES[res.grade] || res.grade) + '. فُعّلت لذلك الصف.' };
   return { ok: true, grade: res.grade };
 }
 
@@ -122,7 +123,7 @@ const CSS = `
 export function askCode(grade, { voluntary = false } = {}) {
   return new Promise((resolve) => {
     if (!document.getElementById('alw-css')) document.head.insertAdjacentHTML('beforeend', `<style id="alw-css">${CSS}</style>`);
-    const name = GRADE_NAMES[grade] || '';
+    const name = [].concat(grade || []).map((g) => GRADE_NAMES[g] || g).join(' أو ');
     const wa = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent('أريد الاشتراك في اللوح المحاور، صف: ' + name)}`;
     const bg = document.createElement('div');
     bg.className = 'alw-bg';
@@ -151,8 +152,13 @@ export function askCode(grade, { voluntary = false } = {}) {
 }
 
 // الدالة التي تستدعيها الكتب: lesson رقم الدرس داخل فصله ابتداءً من 1
+// grade قد يكون مصفوفة لكتاب يشترك فيه صفّان (كالعربية للسادس العلمي والأدبي)
+export async function anyAccess(grade, opts) {
+  for (const g of [].concat(grade || [])) if (await hasAccess(g, opts)) return true;
+  return false;
+}
 export async function gate({ grade, lesson }) {
   if (lesson <= FREE) return true;
-  if (await hasAccess(grade)) return true;
+  if (await anyAccess(grade)) return true;
   return askCode(grade);
 }
